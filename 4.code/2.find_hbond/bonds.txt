@@ -1,0 +1,87 @@
+Este código é uma classe Python chamada `Bonds` que herda de `Select_Extract` (uma classe não mostrada no código) e é projetada para analisar ligações químicas, especialmente **ligações de hidrogênio (H-bonds)** e **ligações entre átomos pesados**, em sistemas moleculares simulados. Ele utiliza a biblioteca **MDAnalysis**, comumente usada para análise de simulações de dinâmica molecular.
+
+Aqui está uma explicação detalhada do que o código faz:
+
+---
+
+### **Objetivo Geral**
+O código analisa um sistema molecular (por exemplo, uma proteína ou complexo molecular) e identifica:
+1. **Ligações entre átomos pesados** (não hidrogênio).
+2. **Ligações de hidrogênio** (H-bonds) no sistema.
+3. **Ligações de hidrogênio envolvendo átomos de hidrogênio reativos** (especificados pelo usuário).
+
+Ele também calcula distâncias entre átomos e gera rótulos (labels) para identificar essas ligações.
+
+---
+
+### **Métodos Principais**
+
+1. **`_is_hbond(donor, hydrogen, acceptor)`**:
+   - Verifica se três átomos (doador, hidrogênio e aceitador) formam uma ligação de hidrogênio.
+   - Usa critérios de distância e ângulo:
+     - Distância doador-hidrogênio (`dh_dist`) ≤ 1.2 Å.
+     - Distância doador-aceitador (`da_dist`) ≤ 3.0 Å.
+     - Ângulo doador-hidrogênio-aceitador (`dha_angle`) ≥ 110° (e imprime um aviso se ≥ 150°).
+
+2. **`hvychembonds_label()`**:
+   - Identifica todas as ligações entre átomos pesados (não hidrogênio) no sistema.
+   - Gera rótulos no formato `resid.atomo:resid.atomo` (por exemplo, `71.CZ:71.OH`).
+   - Ignora ligações específicas (como `291.N4:291.C7`) e adiciona manualmente outras (como `69.OG:291.C7`).
+
+3. **`extract_dist_one_replica()`**:
+   - Calcula as distâncias entre os átomos das ligações identificadas em `hvychembonds_label()`.
+   - Retorna uma lista de distâncias correspondentes.
+
+4. **`hbond_labels()`**:
+   - Identifica todas as ligações de hidrogênio no sistema usando a classe `HydrogenBondAnalysis` do MDAnalysis.
+   - Gera rótulos no formato `resid.doador:resid.hidrogênio:resid.aceitador`.
+   - Ignora ligações de hidrogênio intra-resíduos e adiciona manualmente outras (como `TYR.71.OH:TYR.71.HH:GLU.165.OE2`).
+
+5. **`rxhbond_labels()`**:
+   - Identifica ligações de hidrogênio envolvendo átomos de hidrogênio reativos (especificados pelo usuário).
+   - Gera rótulos no formato `resid.doador:resid.hidrogênio` e `resid.aceitador:resid.hidrogênio`.
+
+---
+
+### **Como Funciona**
+1. **Entrada**:
+   - O código espera um sistema molecular carregado em um objeto `MDAnalysis.Universe` (armazenado em `self.u`).
+   - O sistema deve conter átomos pesados e hidrogênios, além de informações sobre as ligações químicas.
+
+2. **Seleção de Átomos**:
+   - Métodos como `qmhvy_sel()` e `qmhdy_sel()` selecionam átomos pesados e hidrogênios, respectivamente, na região de interesse (QM, ou "quantum mechanics region").
+
+3. **Análise**:
+   - O código usa a classe `HydrogenBondAnalysis` do MDAnalysis para identificar ligações de hidrogênio.
+   - Para ligações entre átomos pesados, ele verifica diretamente as ligações químicas armazenadas no sistema.
+
+4. **Saída**:
+   - Rótulos das ligações (em formato legível) e distâncias entre átomos.
+
+---
+
+### **Exemplo de Uso**
+No bloco `if __name__ == "__main__":`, o código é testado:
+1. Define parâmetros como `path_id`, `replica_id`, `sysname`, etc.
+2. Cria uma instância da classe `Bonds`.
+3. Chama métodos como `hvychembonds_label()` para obter rótulos das ligações entre átomos pesados.
+4. Imprime os rótulos e o número de ligações encontradas.
+
+---
+
+### **Dependências**
+- **MDAnalysis**: Biblioteca para análise de simulações de dinâmica molecular.
+- **NumPy**: Usado internamente pelo MDAnalysis para cálculos numéricos.
+- **Select_Extract**: Classe base não mostrada no código, mas presumivelmente responsável por carregar o sistema molecular e fornecer métodos auxiliares.
+
+---
+
+### **Aplicações**
+Esse código pode ser útil para:
+- Estudar interações moleculares em simulações de dinâmica molecular.
+- Identificar ligações de hidrogênio críticas em sistemas biológicos (como proteínas).
+- Analisar mudanças nas ligações químicas ao longo do tempo em simulações.
+
+---
+
+Se precisar de mais detalhes sobre alguma parte específica do código, é só perguntar! 😊

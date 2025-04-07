@@ -1,0 +1,9 @@
+#!/bin/bash
+#SBATCH -J hbonds
+#SBATCH -n 4
+#SBATCH -p development
+#SBATCH --mem=20Gb
+#SBATCH -o hbonds_reactant.3.0.out
+
+source activate mdanalb
+python3 -u hbonds.py > hbonds_reactant.2.8.log

@@ -35,7 +35,7 @@ Os arrays retornados são:
 
 enes_pathway: energia de cada caminho.
 
-ene_barrier: energia de barreira.
+ene_barrier: barreira de energia.
 
 reverse_enes: energias para as reações reversas.
 
@@ -51,54 +51,12 @@ Para Single_path=True e Single_replica=False, as cargas para um único caminho, 
 Para Single_path=True e Single_replica=True, as cargas para um único caminho e uma única réplica.
 
 7. Método get_dist:
-Calcula a distância entre dois átomos, usando suas posições (vetores tridimensionais) e a fórmula da distância euclidiana:
-
-dist
-a
-ˆ
-ncia
-=
-∥
-𝑟
-1
-−
-𝑟
-2
-∥
-dist 
-a
-ˆ
- ncia=∥r 
-1
-​
- −r 
-2
-​
- ∥
-Onde 
-𝑟
-1
-r 
-1
-​
-  e 
-𝑟
-2
-r 
-2
-​
-  são as posições dos átomos 1 e 2, respectivamente.
+Calcula a distância entre dois átomos, usando suas posições (vetores tridimensionais) e a fórmula da distância euclidiana.
 
 8. Método get_angle:
 Calcula o ângulo D-H-A entre três átomos (usado, por exemplo, para calcular o ângulo entre o doador, hidrogênio e aceitador em uma ligação de hidrogênio).
 
-A fórmula utilizada envolve o cálculo do produto escalar entre os vetores 
-𝐷
-𝐻
-DH e 
-𝐻
-𝐴
-HA, e então a inversa do cosseno é aplicada para encontrar o ângulo.
+A fórmula utilizada envolve o cálculo do produto escalar entre os vetores DH e HA, e então a inversa do cosseno é aplicada para encontrar o ângulo.
 
 9. Execução do Código (bloco if __name__ == "__main__"):
 O bloco principal inicializa uma instância da classe Base_Info com os parâmetros fornecidos, incluindo os diretórios de trabalho, IDs de caminho e réplica, e o nome do sistema.

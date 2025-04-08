@@ -1,111 +1,80 @@
-Este código define uma classe chamada `merge_unique_labels` que consolida **ligações de hidrogênio (H-bonds)**, **ligações de hidrogênio reativas (rxhbonds)** e **ligações químicas entre átomos pesados** de múltiplas estruturas moleculares (caminhos e réplicas) em diferentes estados de um sistema simulado. Ele utiliza multiprocessamento para acelerar a extração dessas ligações e, em seguida, consolida as ligações únicas em listas.
+Esse código tem como objetivo realizar a mesclagem de ligações únicas (como ligações de hidrogênio, reações de hidrogênio e ligações químicas) a partir de múltiplos arquivos ou simulações, e utiliza o processamento paralelo para acelerar o processo. 
 
-Aqui está uma explicação detalhada do que o código faz:
+1. Classe merge_unique_labels
+Essa classe tem a responsabilidade de mesclar as ligações de hidrogênio, reações de hidrogênio e ligações químicas únicas extraídas de várias simulações. Ela recebe como parâmetros:
 
----
+_basedir: O diretório base onde os dados de simulação estão armazenados.
 
-### **Objetivo Geral**
-O código tem como objetivo:
-1. Consolidar ligações de hidrogênio, ligações de hidrogênio reativas e ligações químicas entre átomos pesados de múltiplas estruturas (caminhos e réplicas) em diferentes estados de um sistema molecular.
-2. Utilizar multiprocessamento para acelerar a extração dessas ligações.
-3. Retornar listas de ligações únicas para análise ou salvamento.
+NPath: O número de caminhos (ou trajetórias) na simulação.
 
----
+NReplicas: O número de réplicas das simulações.
 
-### **Componentes do Código**
+Na inicialização da classe (__init__), quatro objetos da classe batch_extract são criados. Cada um desses objetos corresponde a uma simulação específica (com diferentes variantes do sistema):
 
-1. **Importações**:
-   - `multiprocessing.Pool`: Para paralelizar a extração de ligações.
-   - `batch_extract`: Classe (definida em outro arquivo) que extrai ligações de hidrogênio, ligações de hidrogênio reativas e ligações químicas entre átomos pesados.
-   - `numpy`: Para salvar as ligações únicas em arquivos `.npz`.
+wt_d1: Simulação para o sistema "kpc_wt" no estado "d1".
 
-2. **Classe `merge_unique_labels`**:
-   - **`__init__`**:
-     - Inicializa a classe com o diretório base (`_basedir`), número de caminhos (`NPath`) e número de réplicas (`NReplicas`).
-     - Cria instâncias da classe `batch_extract` para quatro combinações de sistema e estado:
-       - `kpc_wt` no estado `d1` (`wt_d1`).
-       - `kpc_wt` no estado `d2` (`wt_d2`).
-       - `kpc_y72` no estado `d1` (`y72_d1`).
-       - `kpc_y72` no estado `d2` (`y72_d2`).
+wt_d2: Simulação para o sistema "kpc_wt" no estado "d2".
 
-   - **`merge_hbonds`**:
-     - Consolida todas as ligações de hidrogênio únicas dos quatro sistemas/estados.
-     - Usa multiprocessamento para extrair as ligações de hidrogênio de cada sistema/estado em paralelo.
-     - Adiciona manualmente uma ligação de hidrogênio específica (`TYR.71.OH:TYR.71.HH:GLU.165.OE2`) à lista final.
+y72_d1: Simulação para o sistema "kpc_y72" no estado "d1".
 
-   - **`merge_rxhbonds`**:
-     - Consolida todas as ligações de hidrogênio reativas únicas dos quatro sistemas/estados.
-     - Usa multiprocessamento para extrair as ligações de hidrogênio reativas de cada sistema/estado em paralelo.
+y72_d2: Simulação para o sistema "kpc_y72" no estado "d2".
 
-   - **`merge_chembonds`**:
-     - Consolida todas as ligações químicas entre átomos pesados únicas dos quatro sistemas/estados.
-     - Extrai as ligações químicas de cada sistema/estado sequencialmente (sem multiprocessamento).
+Esses objetos batch_extract são responsáveis por extrair as ligações de hidrogênio, reações de hidrogênio e ligações químicas de cada simulação, como explicado no código anterior.
 
----
+2. Métodos para Mesclagem das Ligações
+a. merge_hbonds()
+Esse método tem como objetivo mesclar todas as ligações de hidrogênio (Hbonds) de todas as estruturas (todos os caminhos e réplicas). O código usa multiprocessing para realizar o processamento paralelo, distribuindo o trabalho de extração de ligações de hidrogênio entre 4 processos. O processo é o seguinte:
 
-### **Como Funciona**
+Criação de um Pool de 4 processos.
 
-1. **Inicialização**:
-   - A classe é inicializada com o diretório base, número de caminhos e número de réplicas.
-   - Quatro instâncias da classe `batch_extract` são criadas para os sistemas/estados `kpc_wt_d1`, `kpc_wt_d2`, `kpc_y72_d1` e `kpc_y72_d2`.
+Para cada simulação (wt_d1, wt_d2, y72_d1, y72_d2), é chamado o método extract_hbonds_on_one_structure() de maneira assíncrona usando apply_async(). Isso faz com que os cálculos para cada simulação ocorram simultaneamente.
 
-2. **Consolidação das Ligações**:
-   - **Ligações de Hidrogênio**:
-     - O método `merge_hbonds` usa multiprocessamento para extrair as ligações de hidrogênio de cada sistema/estado em paralelo.
-     - As ligações são consolidadas em uma lista única, e uma ligação específica (`TYR.71.OH:TYR.71.HH:GLU.165.OE2`) é adicionada manualmente.
-   - **Ligações de Hidrogênio Reativas**:
-     - O método `merge_rxhbonds` usa multiprocessamento para extrair as ligações de hidrogênio reativas de cada sistema/estado em paralelo.
-     - As ligações são consolidadas em uma lista única.
-   - **Ligações Químicas entre Átomos Pesados**:
-     - O método `merge_chembonds` extrai as ligações químicas de cada sistema/estado sequencialmente.
-     - As ligações são consolidadas em uma lista única.
+O método get() é utilizado para coletar os resultados de cada processo após a execução.
 
-3. **Saída**:
-   - As listas de ligações únicas são retornadas para análise ou salvamento.
+Em seguida, as etiquetas de ligações de hidrogênio de todas as simulações são mescladas, e as duplicatas são removidas.
 
----
+Além disso, a ligação específica "TYR.71.OH:TYR.71.HH:GLU.165.OE2" é adicionada à lista de ligações únicas.
 
-### **Exemplo de Uso**
-No bloco `if __name__ == "__main__":`, o código é testado:
-1. Define parâmetros como `_basedir`, `NPath`, `NReplicas`.
-2. Cria uma instância da classe `merge_unique_labels`.
-3. Chama o método `merge_hbonds` para consolidar as ligações de hidrogênio únicas.
-4. Imprime as ligações únicas e o número total de ligações.
+O método retorna a lista de ligações de hidrogênio únicas.
 
----
+b. merge_rxhbonds()
+O processo para as ligações reativas de hidrogênio (rxhbonds) é praticamente o mesmo do método anterior. As etapas incluem:
 
-### **Saída Esperada**
-Se o código for executado com os parâmetros fornecidos, ele pode retornar algo como:
-```python
-['TYR.71.OH:TYR.71.HH:GLU.165.OE2', 'SER.69.OG:SER.69.HG:IMI.291.N4', ...] 25
-```
-- A lista contém todas as ligações de hidrogênio únicas.
-- O número `25` indica o total de ligações únicas encontradas.
+A criação de um Pool com 4 processos para processar as quatro simulações de maneira paralela.
 
----
+A coleta das ligações reativas de hidrogênio usando extract_rxhbonds_on_one_structure() e mesclagem das etiquetas únicas.
 
-### **Aplicações**
-Esse código pode ser útil para:
-- Consolidar dados de ligações de hidrogênio, ligações de hidrogênio reativas e ligações químicas entre átomos pesados de grandes conjuntos de simulações moleculares.
-- Salvar ligações únicas para análise posterior (por exemplo, em scripts de machine learning ou visualização).
-- Comparar ligações entre diferentes estados ou sistemas moleculares.
+O método retorna as ligações reativas de hidrogênio únicas.
 
----
+c. merge_chembonds()
+Este método realiza o mesmo tipo de processo, mas para ligações químicas envolvendo átomos pesados (heavy atoms). O código:
 
-### **Dependências**
-- **Classe `batch_extract`**: Responsável por extrair ligações de hidrogênio, ligações de hidrogênio reativas e ligações químicas entre átomos pesados.
-- **Multiprocessamento**: Para acelerar a extração de ligações.
+Chama o método extract_chembonds_on_one_structure() para cada uma das simulações.
 
----
+Mescla as etiquetas únicas de ligações químicas.
 
-### **Possíveis Melhorias**
-1. **Flexibilidade**:
-   - Permitir a consolidação de outros tipos de ligações ou propriedades moleculares.
-2. **Visualização**:
-   - Adicionar funcionalidades para visualizar as ligações únicas (por exemplo, usando bibliotecas como `matplotlib` ou `nglview`).
-3. **Paralelização**:
-   - Estender o uso de multiprocessamento para a consolidação de ligações químicas entre átomos pesados.
+Retorna a lista de ligações químicas únicas.
 
----
+3. Uso do Multiprocessing
+O uso do multiprocessing permite que as extrações das ligações para diferentes simulações sejam feitas em paralelo, acelerando significativamente o processo de cálculo, especialmente se o número de caminhos (NPath) e réplicas (NReplicas) for grande. O uso do Pool facilita a execução assíncrona dos cálculos, evitando que o código fique bloqueado esperando que cada tarefa termine sequencialmente.
 
-Se precisar de mais detalhes ou explicações sobre alguma parte específica, é só perguntar! 😊
+4. Execução Principal (if __name__ == "__main__")
+No bloco principal do código:
+
+Um objeto da classe merge_unique_labels é instanciado, fornecendo o diretório base e os parâmetros de número de caminhos e réplicas.
+
+O método merge_hbonds() é chamado para mesclar as ligações de hidrogênio, e o resultado é impresso.
+
+Os métodos para rxhbonds e chembonds estão comentados, mas podem ser ativados de forma semelhante.
+
+Por fim, os resultados das ligações podem ser salvos em arquivos .npz usando np.savez() (comentado no código).
+
+5. Considerações Finais
+Eficiência: O uso do multiprocessing é uma boa estratégia para paralelizar a extração das ligações, garantindo que o código seja executado de maneira mais rápida em simulações grandes com múltiplas réplicas.
+
+Escalabilidade: Esse código pode ser facilmente escalado para usar mais processos se o número de núcleos de CPU disponíveis for maior, ajustando o parâmetro processes do Pool.
+
+Extensibilidade: A estrutura do código é bem modular, e pode ser estendida facilmente para incluir outros tipos de ligações ou simulações. Além disso, o código pode ser modificado para lidar com diferentes tipos de dados ou condições de simulação.
+
+6. Conclusão
+Este código fornece uma abordagem eficiente para combinar ligações moleculares de diferentes simulações e estados usando processamento paralelo. Ele coleta e mescla informações sobre ligações de hidrogênio, ligações reativas de hidrogênio e ligações químicas para análise posterior. Se você estiver lidando com simulações grandes ou complexas, o uso do multiprocessing ajudará a acelerar o processamento.

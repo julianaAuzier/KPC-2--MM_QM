@@ -1,92 +1,89 @@
-Os códigos que você forneceu trabalham em conjunto para **analisar simulações de dinâmica molecular**, com foco em **ligações químicas**, **ligações de hidrogênio** e **interações entre átomos** em uma região QM (Quantum Mechanics) de um sistema molecular. Eles são organizados em módulos que realizam tarefas específicas, como carregar dados, selecionar átomos, extrair ligações e consolidar resultados. Aqui está um resumo do que cada parte faz e como elas se integram:
+Os códigos trabalham em conjunto para   analisar simulações de dinâmica molecular  , com foco em   ligações químicas  ,   ligações de hidrogênio   e   interações entre átomos   em uma região QM (Quantum Mechanics) de um sistema molecular. Eles são organizados em módulos que realizam tarefas específicas, como carregar dados, selecionar átomos, extrair ligações e consolidar resultados.
 
 ---
 
-### **1. `Base_Info`**
-- **Função**: Carrega informações básicas do sistema molecular, como:
+      1. `Base_Info`  
+-   Função  : Carrega informações básicas do sistema molecular, como:
   - Estruturas moleculares (arquivos PSF e CRD).
   - Perfis de energia (energias do caminho, barreiras energéticas).
   - Cargas atômicas.
-- **Métodos principais**:
+-   Métodos principais  :
   - `load_universe`: Carrega a estrutura molecular usando o MDAnalysis.
   - `load_ene`: Carrega os perfis de energia.
   - `load_chrg`: Carrega as cargas atômicas.
   - `get_dist` e `get_angle`: Calculam distâncias e ângulos entre átomos.
-- **Integração**: Fornece os dados básicos necessários para as análises realizadas pelos outros módulos.
+-   Integração  : Fornece os dados básicos necessários para as análises realizadas pelos outros módulos.
 
 ---
 
-### **2. `Select_Extract`**
-- **Função**: Seleciona e extrai informações específicas sobre átomos na região QM.
-- **Métodos principais**:
+      2. `Select_Extract`  
+-   Função  : Seleciona e extrai informações específicas sobre átomos na região QM.
+-   Métodos principais  :
   - `qm_atom_sel`: Seleciona átomos QM com base em resíduos e nomes.
   - `qmhvy_sel`: Seleciona átomos pesados na região QM.
   - `qmhdy_sel`: Seleciona átomos de hidrogênio na região QM.
   - `qmrxhdy_sel`: Seleciona átomos de hidrogênio reativos.
   - `qmneighbor_sel`: Seleciona átomos vizinhos a um átomo específico.
-- **Integração**: Fornece métodos para selecionar átomos específicos, que são usados para analisar ligações químicas e de hidrogênio.
+-   Integração  : Fornece métodos para selecionar átomos específicos, que são usados para analisar ligações químicas e de hidrogênio.
 
 ---
 
-### **3. `Bonds`**
-- **Função**: Analisa ligações químicas e de hidrogênio no sistema molecular.
-- **Métodos principais**:
+      3. `Bonds`  
+-   Função  : Analisa ligações químicas e de hidrogênio no sistema molecular.
+-   Métodos principais  :
   - `hvychembonds_label`: Identifica ligações químicas entre átomos pesados.
   - `hbond_labels`: Identifica ligações de hidrogênio.
   - `rxhbond_labels`: Identifica ligações de hidrogênio reativas.
   - `extract_dist_one_replica`: Calcula distâncias entre átomos em ligações químicas.
-- **Integração**: Usa os átomos selecionados por `Select_Extract` para identificar e analisar ligações.
+-   Integração  : Usa os átomos selecionados por `Select_Extract` para identificar e analisar ligações.
 
 ---
 
-### **4. `batch_extract`**
-- **Função**: Extrai ligações de hidrogênio e ligações químicas para múltiplas estruturas (caminhos e réplicas) de um sistema molecular.
-- **Métodos principais**:
+      4. `batch_extract`  
+-   Função  : Extrai ligações de hidrogênio e ligações químicas para múltiplas estruturas (caminhos e réplicas) de um sistema molecular.
+-   Métodos principais  :
   - `extract_hbonds_on_one_structure`: Extrai ligações de hidrogênio para todas as estruturas.
   - `extract_rxhbonds_on_one_structure`: Extrai ligações de hidrogênio reativas para todas as estruturas.
   - `extract_chembonds_on_one_structure`: Extrai ligações químicas entre átomos pesados para todas as estruturas.
-- **Integração**: Consolida as ligações extraídas para múltiplas estruturas, preparando os dados para análise posterior.
+-   Integração  : Consolida as ligações extraídas para múltiplas estruturas, preparando os dados para análise posterior.
 
 ---
 
-### **5. `merge_unique_labels`**
-- **Função**: Consolida ligações de hidrogênio e ligações químicas únicas de múltiplos sistemas e estados.
-- **Métodos principais**:
+      5. `merge_unique_labels`  
+-   Função  : Consolida ligações de hidrogênio e ligações químicas únicas de múltiplos sistemas e estados.
+-   Métodos principais  :
   - `merge_hbonds`: Consolida ligações de hidrogênio únicas.
   - `merge_rxhbonds`: Consolida ligações de hidrogênio reativas únicas.
   - `merge_chembonds`: Consolida ligações químicas entre átomos pesados únicas.
-- **Integração**: Usa multiprocessamento para acelerar a consolidação das ligações extraídas por `batch_extract`.
+-   Integração  : Usa multiprocessamento para acelerar a consolidação das ligações extraídas por `batch_extract`.
 
 ---
 
-### **Fluxo de Trabalho em Conjunto**
-1. **Carregamento de Dados**:
+      Fluxo de Trabalho em Conjunto  
+1.   Carregamento de Dados  :
    - `Base_Info` carrega as estruturas moleculares, energias e cargas atômicas.
-2. **Seleção de Átomos**:
+2.   Seleção de Átomos  :
    - `Select_Extract` seleciona átomos específicos (QM, pesados, hidrogênios, vizinhos) com base nos dados carregados.
-3. **Análise de Ligações**:
+3.   Análise de Ligações  :
    - `Bonds` usa os átomos selecionados para identificar ligações químicas e de hidrogênio.
-4. **Extração em Lote**:
+4.   Extração em Lote  :
    - `batch_extract` extrai ligações de hidrogênio e químicas para múltiplas estruturas (caminhos e réplicas).
-5. **Consolidação**:
+5.   Consolidação  :
    - `merge_unique_labels` consolida as ligações extraídas em listas únicas, eliminando duplicatas.
 
 ---
 
-### **Resultado Final**
-- **Ligações de Hidrogênio Únicas**: Lista de todas as ligações de hidrogênio únicas no sistema.
-- **Ligações de Hidrogênio Reativas Únicas**: Lista de todas as ligações de hidrogênio reativas únicas.
-- **Ligações Químicas Únicas**: Lista de todas as ligações químicas entre átomos pesados únicas.
-- **Dados Salvos**: As listas de ligações únicas são salvas em arquivos `.npy` ou `.npz` para análise posterior.
+      Resultado Final  
+-   Ligações de Hidrogênio Únicas  : Lista de todas as ligações de hidrogênio únicas no sistema.
+-   Ligações de Hidrogênio Reativas Únicas  : Lista de todas as ligações de hidrogênio reativas únicas.
+-   Ligações Químicas Únicas  : Lista de todas as ligações químicas entre átomos pesados únicas.
+-   Dados Salvos  : As listas de ligações únicas são salvas em arquivos `.npy` ou `.npz` para análise posterior.
 
 ---
 
-### **Aplicações**
+      Aplicações  
 Esses códigos são úteis para:
 - Analisar interações moleculares em simulações de dinâmica molecular.
 - Identificar ligações críticas (como ligações de hidrogênio) em sistemas biológicos.
 - Consolidar dados de múltiplas simulações para estudos comparativos ou estatísticos.
 
----
-
-Se precisar de mais detalhes ou explicações sobre alguma parte específica, é só perguntar! 😊

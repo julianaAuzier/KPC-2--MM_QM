@@ -1,87 +1,30 @@
-Este código é uma classe Python chamada `Bonds` que herda de `Select_Extract` (uma classe não mostrada no código) e é projetada para analisar ligações químicas, especialmente **ligações de hidrogênio (H-bonds)** e **ligações entre átomos pesados**, em sistemas moleculares simulados. Ele utiliza a biblioteca **MDAnalysis**, comumente usada para análise de simulações de dinâmica molecular.
-
-Aqui está uma explicação detalhada do que o código faz:
-
----
-
-### **Objetivo Geral**
-O código analisa um sistema molecular (por exemplo, uma proteína ou complexo molecular) e identifica:
-1. **Ligações entre átomos pesados** (não hidrogênio).
-2. **Ligações de hidrogênio** (H-bonds) no sistema.
-3. **Ligações de hidrogênio envolvendo átomos de hidrogênio reativos** (especificados pelo usuário).
-
-Ele também calcula distâncias entre átomos e gera rótulos (labels) para identificar essas ligações.
-
----
-
-### **Métodos Principais**
-
-1. **`_is_hbond(donor, hydrogen, acceptor)`**:
-   - Verifica se três átomos (doador, hidrogênio e aceitador) formam uma ligação de hidrogênio.
-   - Usa critérios de distância e ângulo:
-     - Distância doador-hidrogênio (`dh_dist`) ≤ 1.2 Å.
-     - Distância doador-aceitador (`da_dist`) ≤ 3.0 Å.
-     - Ângulo doador-hidrogênio-aceitador (`dha_angle`) ≥ 110° (e imprime um aviso se ≥ 150°).
-
-2. **`hvychembonds_label()`**:
-   - Identifica todas as ligações entre átomos pesados (não hidrogênio) no sistema.
-   - Gera rótulos no formato `resid.atomo:resid.atomo` (por exemplo, `71.CZ:71.OH`).
-   - Ignora ligações específicas (como `291.N4:291.C7`) e adiciona manualmente outras (como `69.OG:291.C7`).
-
-3. **`extract_dist_one_replica()`**:
-   - Calcula as distâncias entre os átomos das ligações identificadas em `hvychembonds_label()`.
-   - Retorna uma lista de distâncias correspondentes.
-
-4. **`hbond_labels()`**:
-   - Identifica todas as ligações de hidrogênio no sistema usando a classe `HydrogenBondAnalysis` do MDAnalysis.
-   - Gera rótulos no formato `resid.doador:resid.hidrogênio:resid.aceitador`.
-   - Ignora ligações de hidrogênio intra-resíduos e adiciona manualmente outras (como `TYR.71.OH:TYR.71.HH:GLU.165.OE2`).
-
-5. **`rxhbond_labels()`**:
-   - Identifica ligações de hidrogênio envolvendo átomos de hidrogênio reativos (especificados pelo usuário).
-   - Gera rótulos no formato `resid.doador:resid.hidrogênio` e `resid.aceitador:resid.hidrogênio`.
-
----
-
-### **Como Funciona**
-1. **Entrada**:
-   - O código espera um sistema molecular carregado em um objeto `MDAnalysis.Universe` (armazenado em `self.u`).
-   - O sistema deve conter átomos pesados e hidrogênios, além de informações sobre as ligações químicas.
-
-2. **Seleção de Átomos**:
-   - Métodos como `qmhvy_sel()` e `qmhdy_sel()` selecionam átomos pesados e hidrogênios, respectivamente, na região de interesse (QM, ou "quantum mechanics region").
-
-3. **Análise**:
-   - O código usa a classe `HydrogenBondAnalysis` do MDAnalysis para identificar ligações de hidrogênio.
-   - Para ligações entre átomos pesados, ele verifica diretamente as ligações químicas armazenadas no sistema.
-
-4. **Saída**:
-   - Rótulos das ligações (em formato legível) e distâncias entre átomos.
-
----
-
-### **Exemplo de Uso**
-No bloco `if __name__ == "__main__":`, o código é testado:
-1. Define parâmetros como `path_id`, `replica_id`, `sysname`, etc.
-2. Cria uma instância da classe `Bonds`.
-3. Chama métodos como `hvychembonds_label()` para obter rótulos das ligações entre átomos pesados.
-4. Imprime os rótulos e o número de ligações encontradas.
-
----
-
-### **Dependências**
-- **MDAnalysis**: Biblioteca para análise de simulações de dinâmica molecular.
-- **NumPy**: Usado internamente pelo MDAnalysis para cálculos numéricos.
-- **Select_Extract**: Classe base não mostrada no código, mas presumivelmente responsável por carregar o sistema molecular e fornecer métodos auxiliares.
-
----
-
-### **Aplicações**
-Esse código pode ser útil para:
-- Estudar interações moleculares em simulações de dinâmica molecular.
-- Identificar ligações de hidrogênio críticas em sistemas biológicos (como proteínas).
-- Analisar mudanças nas ligações químicas ao longo do tempo em simulações.
-
----
-
-Se precisar de mais detalhes sobre alguma parte específica do código, é só perguntar! 😊
+Análise de um sistema molecular, focando principalmente em ligações químicas, incluindo ligações de hidrogênio (H-bonds). O código usa o pacote MDAnalysis, que é amplamente utilizado para análise de trajetórias de dinâmica molecular.
+1. Importação de Bibliotecas e Definição de Classe:
+    • O código importa a classe Select_Extract (que provavelmente é uma classe personalizada definida em outro lugar) e a classe HydrogenBondAnalysis de MDAnalysis, que é usada para analisar ligações de hidrogênio.
+    • A classe Bonds é definida, que herda de Select_Extract e contém métodos para analisar várias características do sistema molecular, como ligações entre átomos pesados (não hidrogênios) e ligações de hidrogênio.
+2. Método _is_hbond:
+    • Verifica se um átomo de hidrogênio está envolvido em uma ligação de hidrogênio com um doador e um aceitador, utilizando parâmetros como distâncias e ângulos.
+    • Os critérios para uma ligação de hidrogênio válida são:
+        ◦ Distância do átomo doador ao hidrogênio (dh_dist) ≤ 1.2 Å.
+        ◦ Distância do átomo doador ao aceitador (da_dist) ≤ 3.0 Å.
+        ◦ Ângulo entre doador-hidrogênio-aceitador (dha_angle) ≥ 110°, com um destaque para ângulos superiores a 150°.
+3. Método hvychembonds_label:
+    • Encontra e gera rótulos (labels) para todas as ligações entre átomos pesados (átomos que não são hidrogênios).
+    • Ele seleciona átomos pesados e verifica suas ligações dentro do sistema, armazenando-as em uma lista bonds_label.
+    • Algumas ligações específicas são manualmente adicionadas à lista de rótulos.
+4. Método extract_dist_one_replica:
+    • Utiliza os rótulos das ligações pesadas e calcula as distâncias entre os pares de átomos que formam essas ligações.
+    • A função get_dist é usada para calcular a distância entre dois átomos selecionados com base nos rótulos.
+5. Método hbond_labels:
+    • Realiza a análise de todas as ligações de hidrogênio no sistema, selecionando átomos doadores e aceitadores da região QM (mecânica quântica).
+    • Utiliza o HydrogenBondAnalysis para encontrar as ligações de hidrogênio que atendem a certos critérios, como distância e ângulo.
+    • Depois, cria rótulos para essas ligações de hidrogênio, levando em consideração a exibição de informações como o nome do resíduo e o identificador do átomo.
+6. Método rxhbond_labels:
+    • Foca em encontrar ligações de hidrogênio relacionadas a hidrogênios reativos (que podem ser definidos pelo usuário).
+    • A análise de ligações de hidrogênio é feita entre átomos pesados e átomos de hidrogênio reativos, e as ligações são representadas com rótulos específicos.
+7. Execução do Script Principal:
+    • No final do script, uma instância da classe Bonds é criada e usada para analisar o sistema molecular. O código também mostra como realizar seleções de átomos e como obter as distâncias entre pares de átomos, além de obter rótulos para as ligações de hidrogênio e outras interações moleculares.
+    • O script também inclui exemplos de como as distâncias e rótulos de ligações de hidrogênio podem ser extraídos e exibidos.
+Objetivo Geral do Código:
+    • O código realiza uma análise detalhada de um sistema molecular, identificando ligações entre átomos pesados e ligações de hidrogênio (incluindo ligações envolvendo hidrogênios reativos), calculando distâncias entre átomos e criando rótulos para identificar essas ligações.
+    • Esse tipo de análise pode ser útil para estudar interações moleculares em simulações de dinâmica molecular, como no caso de proteínas ou complexos moleculares.

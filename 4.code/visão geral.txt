@@ -8,7 +8,7 @@ O artigo foca no estudo de um material energético de alta densidade e baixa sen
 2. Prever propriedades energéticas e de sensibilidade.
 3. Identificar ligações críticas que influenciam o desempenho do material.
 
-Os códigos que você enviou são parte da análise estrutural e dinâmica do material, enquanto os códigos de XGBoost, SVM e redes neurais são usados para a predição de propriedades com base nos dados gerados.
+Os códigos são parte da análise estrutural e dinâmica do material, enquanto os códigos de XGBoost, SVM e redes neurais são usados para a predição de propriedades com base nos dados gerados.
 
 ---
 
@@ -30,38 +30,24 @@ Os dados gerados por esses códigos (ligações químicas, distâncias, ângulos
 - Características (features):
   - As ligações de hidrogênio, ligações químicas e distâncias entre átomos são usadas como features para treinar modelos como XGBoost, SVM e redes neurais.
 - Propriedades Alvo (targets):
-  - As energias das ligações e as barreiras energéticas são usadas como alvos para predição.
+  - A energia de barreira da reação de deacilação é usada como alvo para predição.
 
  3. Predição de Propriedades
-Os códigos de XGBoost, SVM e redes neurais (que você mencionou que enviará em breve) são usados para:
-- Prever propriedades energéticas:
-  - Com base nas features extraídas, os modelos preveem propriedades como energia de decomposição e sensibilidade ao impacto.
-- Identificar padrões:
-  - Os modelos ajudam a identificar quais ligações e interações são mais críticas para o desempenho do material.
-
+Os códigos de XGBoost, SVM e redes neurais são usados para:
+-  Prever energias de barreira da reação de deacilação e identificar padrões de interações estruturais que influenciam essa barreira energética
 ---
 
  Fluxo de Trabalho no Artigo
 1. Simulações de Dinâmica Molecular:
    - Os autores realizam simulações de MD para gerar trajetórias do material em diferentes condições.
 2. Análise Estrutural:
-   - Os códigos que você enviou são usados para processar as trajetórias, identificar ligações e calcular propriedades estruturais.
+   - Os códigos são usados para processar as trajetórias, identificar ligações e calcular propriedades estruturais.
 3. Geração de Dados:
    - As ligações, distâncias e energias são consolidados em um conjunto de dados para treinamento de modelos de aprendizado de máquina.
 4. Predição com Aprendizado de Máquina:
    - XGBoost, SVM e redes neurais são usados para prever propriedades energéticas e de sensibilidade.
 5. Validação e Interpretação:
    - Os resultados são validados e interpretados para entender o comportamento do material e propor melhorias.
-
----
-
- Contribuição dos Códigos para o Artigo
-- Análise Detalhada:
-  - Os códigos permitem uma análise detalhada das interações moleculares, que é essencial para entender a estabilidade e o desempenho do material.
-- Automatização:
-  - A automatização do processamento de dados e da identificação de ligações acelera a análise de grandes conjuntos de dados gerados pelas simulações.
-- Integração com Aprendizado de Máquina:
-  - Os dados gerados são usados para treinar modelos preditivos, que são uma parte crucial da metodologia do artigo.
 
 ---
 
